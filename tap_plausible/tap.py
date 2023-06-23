@@ -17,17 +17,22 @@ class TapPlausible(Tap):
     # TODO: Update this section with the actual config values you expect:
     config_jsonschema = th.PropertiesList(
         th.Property(
-            "auth_token",
+            "api_key",
             th.StringType,
             required=True,
             secret=True,  # Flag config as protected.
-            description="The token to authenticate against the API service",
+            description="Plausible API Key. See the <a" +
+            "*href=\"https://plausible.io/docs/stats-api\">docs</a>" +
+            "for information on how to generate this key."
         ),
         th.Property(
-            "project_ids",
-            th.ArrayType(th.StringType),
+            "site_id",
+            th.StringType,
             required=True,
-            description="Project IDs to replicate",
+            description="The domain of the site you want to retrieve data for. " +
+                "Enter the name of your site as configured on Plausible," +
+                "i.e., excluding \"https://\" and \"www\". Can be retrieved from " +
+                "the 'domain' field in your Plausible site settings."
         ),
         th.Property(
             "start_date",
@@ -38,7 +43,7 @@ class TapPlausible(Tap):
             "api_url",
             th.StringType,
             default="https://api.mysample.com",
-            description="The url for the API service",
+            description="The url for the API service (without /api/v1 prefix!)",
         ),
     ).to_dict()
 
@@ -49,8 +54,7 @@ class TapPlausible(Tap):
             A list of discovered streams.
         """
         return [
-            streams.GroupsStream(self),
-            streams.UsersStream(self),
+            streams.StatsStream(self)
         ]
 
 

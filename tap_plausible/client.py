@@ -21,10 +21,9 @@ class PlausibleStream(RESTStream):
     @property
     def url_base(self) -> str:
         """Return the API URL root, configurable via tap settings."""
-        # TODO: hardcode a value here, or retrieve it from self.config
-        return "https://api.mysample.com"
+        return self.config.get("api_url")
 
-    records_jsonpath = "$[*]"  # Or override `parse_response`.
+    records_jsonpath = "$.results[*]"  # Or override `parse_response`.
 
     # Set this value or override `get_new_paginator`.
     next_page_token_jsonpath = "$.next_page"  # noqa: S105
@@ -38,7 +37,7 @@ class PlausibleStream(RESTStream):
         """
         return BearerTokenAuthenticator.create_for_stream(
             self,
-            token=self.config.get("auth_token", ""),
+            token=self.config.get("api_key", ""),
         )
 
     @property
@@ -51,8 +50,7 @@ class PlausibleStream(RESTStream):
         headers = {}
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
-        # If not using an authenticator, you may also provide inline auth headers:
-        # headers["Private-Token"] = self.config.get("auth_token")  # noqa: ERA001
+        
         return headers
 
     def get_new_paginator(self) -> BaseAPIPaginator:
@@ -84,12 +82,12 @@ class PlausibleStream(RESTStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        params: dict = {}
-        if next_page_token:
-            params["page"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
+        params: dict = {
+            "site_id": self.config.get("site_id")
+        }
+        
+        # Plausible API doesn't have paging
+        
         return params
 
     def prepare_request_payload(
