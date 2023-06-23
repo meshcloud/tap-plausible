@@ -16,8 +16,6 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
 class StatsStream(PlausibleStream):
-    """Define custom stream."""
-
     name = "stats"
     path = "/api/v1/stats/timeseries"
     primary_keys = ["date"]
@@ -43,7 +41,7 @@ class StatsStream(PlausibleStream):
         return params
     
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        if (row.get('bounce_rate') is not None):
+        if (row.get('bounce_rate') is not None): # indicates no data is recorded for that day
             return row
         
         return None

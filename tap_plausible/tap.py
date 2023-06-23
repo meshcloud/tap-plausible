@@ -26,8 +26,8 @@ class TapPlausible(Tap):
             "for information on how to generate this key."
         ),
         th.Property(
-            "site_id",
-            th.StringType,
+            "site_ids",
+            th.ArrayType(th.StringType),
             required=True,
             description="The domain of the site you want to retrieve data for. " +
                 "Enter the name of your site as configured on Plausible," +
